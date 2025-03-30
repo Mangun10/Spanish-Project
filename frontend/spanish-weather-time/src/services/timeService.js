@@ -12,7 +12,7 @@ const regionTimezones = {
     try {
       const timezone = regionTimezones[region] || 'Europe/Madrid';
       const response = await fetch(
-        `http://worldtimeapi.org/api/timezone/${timezone}`
+        `https://worldtimeapi.org/api/timezone/${timezone}`
       );
       
       if (!response.ok) {

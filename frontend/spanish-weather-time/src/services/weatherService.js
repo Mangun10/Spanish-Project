@@ -4,7 +4,7 @@ const API_KEY = 'fafac02b7ec54373a50152625253003'; // Replace with your WeatherA
 export const fetchWeatherData = async (city) => {
   try {
     const response = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city},spain&lang=es`
+      `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city},spain&lang=es`
     );
     
     if (!response.ok) {
