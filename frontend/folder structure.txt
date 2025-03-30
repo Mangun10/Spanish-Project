@@ -1,0 +1,19 @@
+│── frontend/                     # React.js frontend
+│   ├── public/                   # Static assets
+│   │   ├── index.html
+│   ├── src/                      
+│   │   ├── assets/               # Images, icons, audio files
+│   │   ├── components/           # Reusable components
+│   │   │   ├── WeatherCard.js
+│   │   │   ├── TimeDisplay.js
+│   │   │   ├── AudioPlayer.js    # Component for pronunciation audio
+│   │   ├── pages/                # Main pages
+│   │   │   ├── Home.js
+│   │   │   ├── Regions.js
+│   │   ├── services/             # API calls to backend
+│   │   │   ├── weatherService.js
+│   │   │   ├── timeService.js
+│   │   ├── styles/               # TailwindCSS or custom styles
+│   │   ├── App.js                # Main React component
+│   │   ├── index.js              # Entry point
+│   ├── package.json              # Frontend dependencies
