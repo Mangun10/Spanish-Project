@@ -20,3 +20,4 @@ export const playRegionAudio = (region) => {
     // In a real implementation, this would play an audio file
     alert(`🔊 Pronunciación: "Son las ${hour}:00"`);
   };
+  

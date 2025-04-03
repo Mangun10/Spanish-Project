@@ -10,6 +10,7 @@ const App = () => {
   const [weatherData, setWeatherData] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [timeData, setTimeData] = useState(null);
+  const [currentTime, setCurrentTime] = useState(null);
   const [currentHour, setCurrentHour] = useState(null);
   const [showTranslations, setShowTranslations] = useState(true);
 
@@ -26,6 +27,9 @@ const App = () => {
       if (time) {
         const date = new Date(time.datetime);
         setCurrentHour(date.getHours());
+        
+        // Add this new line to set the formatted time string
+        setCurrentTime(`${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`);
       }
     };
     
@@ -95,7 +99,9 @@ const App = () => {
           <AudioPlayer 
             region={region} 
             weatherConditionCode={weatherData?.current?.condition?.code}
+            weatherConditionText={weatherData?.current?.condition?.text} // Add this line
             hour={currentHour}
+            timeString={currentTime} // Add this line
             showTranslations={showTranslations}
           />
         </div>
