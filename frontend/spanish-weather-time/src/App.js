@@ -16,25 +16,35 @@ const App = () => {
 
   const regions = ["Madrid", "Barcelona", "Sevilla", "Valencia", "Bilbao"];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const weather = await fetchWeatherData(region);
-      const time = await fetchTimeData(region);
-      
-      setWeatherData(weather);
-      setTimeData(time);
-      
-      if (time) {
-        const date = new Date(time.datetime);
-        setCurrentHour(date.getHours());
-        
-        // Add this new line to set the formatted time string
-        setCurrentTime(`${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`);
-      }
-    };
+  // In App.js, make sure you update the time regularly
+useEffect(() => {
+  const fetchData = async () => {
+    const weather = await fetchWeatherData(region);
+    const time = await fetchTimeData(region);
     
-    fetchData();
-  }, [region]);
+    setWeatherData(weather);
+    setTimeData(time);
+    
+    // Update the time immediately with current system time
+    updateCurrentTime();
+  };
+  
+  fetchData();
+  
+  // Function to update current time
+  const updateCurrentTime = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    setCurrentHour(hours);
+    setCurrentTime(`${hours}:${minutes < 10 ? '0' + minutes : minutes}`);
+  };
+  
+  // Update time every minute
+  const timer = setInterval(updateCurrentTime, 60000);
+  
+  return () => clearInterval(timer);
+}, [region]);
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 text-white">

@@ -22,7 +22,7 @@ export const AudioPlayer = ({ region, weatherConditionCode, weatherConditionText
   // Check if we have weather and time data before enabling buttons
   const hasWeatherData = weatherConditionCode && weatherConditionText;
   const hasTimeData = hour !== undefined && timeString;
-  console.log("Weather Data:", hasWeatherData, "Time Data:", hasTimeData);
+  // console.log("Weather Data:", hasWeatherData, "Time Data:", hasTimeData);
 
   return (
     <div className="flex flex-col items-center">
