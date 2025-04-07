@@ -3,3 +3,8 @@ nublado.mp3
 parcialmente-nublado.mp3
 despejado.mp3
 cubierto.mp3
+lluvia-ligera.mp3
+lluvia-moderada.mp3
+lluvia-intensa.mp3
+lluvia.mp3
+niebla.mp3
