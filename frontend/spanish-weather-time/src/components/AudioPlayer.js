@@ -12,7 +12,6 @@ export const AudioPlayer = ({ region, weatherConditionCode, weatherConditionText
       playWeatherAudio(weatherConditionCode, weatherConditionText);
     }
   };
-
   const handlePlayTime = () => {
     if (hour !== undefined && timeString) {
       playTimeAudio(hour, timeString);
