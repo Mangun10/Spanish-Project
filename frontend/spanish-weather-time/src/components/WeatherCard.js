@@ -11,6 +11,7 @@ export const WeatherCard = ({ region, showTranslations }) => {
     const getWeatherData = async () => {
       setLoading(true);
       const data = await fetchWeatherData(region);
+      console.log("Weather data in weather card.js:", data);
       if (data) {
         setWeather(data);
         setError(null);
@@ -41,8 +42,9 @@ export const WeatherCard = ({ region, showTranslations }) => {
     );
   }
 
-  const conditionText = weather.current.condition.text;
-  const englishCondition = weatherTranslations[conditionText] || conditionText;
+// Current code (not working correctly):
+const conditionText = weather.current.condition.text;
+// const englishCondition = weatherTranslations[conditionText] || conditionText;
 
   return (
     <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-lg p-6 shadow-lg text-center">
@@ -57,33 +59,33 @@ export const WeatherCard = ({ region, showTranslations }) => {
         <p className="text-3xl font-bold mt-2">{Math.round(weather.current.temp_c)}°C</p>
         <p className="text-lg">{weather.current.condition.text}</p>
         {showTranslations && (
-          <p className="text-yellow-300 italic text-sm">{englishCondition}</p>
+          <p className="text-yellow-300 italic text-sm">{weather.current.condition.text_english}</p>
         )}
 
         <div className="mt-4 text-sm grid grid-cols-2 gap-4 w-full max-w-xs">
           <div className="bg-white bg-opacity-10 p-2 rounded">
-            <p>{weatherDataTranslations['Sensación térmica']}</p>
+            <p>{weatherDataTranslations['Feels like']}</p>
             {showTranslations && (
               <p className="text-yellow-300 italic text-xs">Feels like</p>
             )}
             <p className="font-bold">{Math.round(weather.current.feelslike_c)}°C</p>
           </div>
           <div className="bg-white bg-opacity-10 p-2 rounded">
-            <p>{weatherDataTranslations['Humedad']}</p>
+            <p>{weatherDataTranslations['Humidity']}</p>
             {showTranslations && (
               <p className="text-yellow-300 italic text-xs">Humidity</p>
             )}
             <p className="font-bold">{weather.current.humidity}%</p>
           </div>
           <div className="bg-white bg-opacity-10 p-2 rounded">
-            <p>{weatherDataTranslations['Viento']}</p>
+            <p>{weatherDataTranslations['Wind']}</p>
             {showTranslations && (
               <p className="text-yellow-300 italic text-xs">Wind</p>
             )}
             <p className="font-bold">{Math.round(weather.current.wind_kph)} km/h</p>
           </div>
           <div className="bg-white bg-opacity-10 p-2 rounded">
-            <p>{weatherDataTranslations['Índice UV']}</p>
+            <p>{weatherDataTranslations['UV Index']}</p>
             {showTranslations && (
               <p className="text-yellow-300 italic text-xs">UV Index</p>
             )}

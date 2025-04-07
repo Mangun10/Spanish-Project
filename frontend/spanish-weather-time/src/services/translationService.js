@@ -47,16 +47,17 @@ export const weatherTranslations = {
   };
   
   // Weather data translations
-  export const weatherDataTranslations = {
-    'Sensación térmica': 'Feels like',
-    'Humedad': 'Humidity',
-    'Viento': 'Wind',
-    'Índice UV': 'UV Index',
-    'Actualizado': 'Updated',
-    'Precipitación': 'Precipitation',
-    'Presión': 'Pressure',
-    'Visibilidad': 'Visibility'
-  };
+  // Reversed weatherDataTranslations (English to Spanish)
+export const weatherDataTranslations = {
+  'Feels like': 'Sensación térmica',
+  'Humidity': 'Humedad',
+  'Wind': 'Viento',
+  'UV Index': 'Índice UV',
+  'Updated': 'Actualizado',
+  'Precipitation': 'Precipitación',
+  'Pressure': 'Presión',
+  'Visibility': 'Visibilidad'
+};
   
   // Region descriptions with translations
   export const regionInfo = {
