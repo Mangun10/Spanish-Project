@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { fetchTimeData } from "../services/timeService";
-import { timeTranslations, regionInfo } from "../services/translationService";
+import { timeTranslations } from "../services/translationService";
+import { 
+  fetchTimeData, 
+  getFullTimeInSpanish,
+  formatTimeInSpanish,
+  formatDateInSpanish
+} from "../services/timeService";
 
 export const TimeDisplay = ({ region, showTranslations }) => {
   const [timeData, setTimeData] = useState(null);
   const [currentTime, setCurrentTime] = useState('');
   const [currentDate, setCurrentDate] = useState('');
+  const [fullTimePhrase, setFullTimePhrase] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -15,19 +21,11 @@ export const TimeDisplay = ({ region, showTranslations }) => {
       const data = await fetchTimeData(region);
       if (data) {
         setTimeData(data);
-        const date = new Date(data.datetime);
         
-        // Format time in Spanish
-        setCurrentTime(`${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`);
-        
-        // Format date in Spanish
-        const spanishDate = new Intl.DateTimeFormat('es-ES', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }).format(date);
-        setCurrentDate(spanishDate);
+        // Use manual formatting functions instead of built-in formatters
+        setCurrentTime(formatTimeInSpanish(data.datetime));
+        setCurrentDate(formatDateInSpanish(data.datetime));
+        setFullTimePhrase(getFullTimeInSpanish(data.datetime));
         
         setError(null);
       } else {
@@ -38,25 +36,15 @@ export const TimeDisplay = ({ region, showTranslations }) => {
 
     getTimeData();
     
-    // Update time every minute
+    // Update time every minute using our manual formatters
     const interval = setInterval(() => {
       const now = new Date();
-      setCurrentTime(`${now.getHours()}:${now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes()}`);
+      setCurrentTime(formatTimeInSpanish(now));
+      setFullTimePhrase(getFullTimeInSpanish(now));
     }, 60000);
     
     return () => clearInterval(interval);
   }, [region]);
-
-  // Get the period of day based on hours
-  const getPeriodOfDay = (hours) => {
-    if (hours < 12) {
-      return 'de la mañana';
-    } else if (hours < 20) {
-      return 'de la tarde';
-    } else {
-      return 'de la noche';
-    }
-  };
 
   if (loading) {
     return (
@@ -76,30 +64,30 @@ export const TimeDisplay = ({ region, showTranslations }) => {
     );
   }
 
-  // Get hours for translation
-  const hours = parseInt(currentTime.split(':')[0]);
-  const periodOfDay = getPeriodOfDay(hours);
+  // Get hours for translation (extract from current time)
+  const hours = new Date(timeData.datetime).getHours();
+  const periodOfDay = hours < 12 ? 'de la mañana' : 
+                     (hours < 20 ? 'de la tarde' : 'de la noche');
   const periodTranslation = timeTranslations[periodOfDay];
 
-  // Format date in English for translation
-  const englishDate = new Intl.DateTimeFormat('en-US', {
+  // For English translation, use the browser's formatter
+  const englishDate = new Date(timeData.datetime).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
-  }).format(new Date(timeData.datetime));
+  });
 
   return (
     <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-lg p-6 shadow-lg text-center">
       <h2 className="text-2xl font-semibold">{region}</h2>
       
-
       <div className="mt-4">
         <p className="text-5xl mb-2">🕒</p>
         <p className="text-3xl font-bold">{currentTime}</p>
         
         <p className="text-sm mt-2">
-          Son las {currentTime} {periodOfDay}
+          {fullTimePhrase}
         </p>
         
         {showTranslations && (
