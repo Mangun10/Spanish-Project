@@ -1,1 +1,5 @@
-
+soleado.mp3
+nublado.mp3
+parcialmente-nublado.mp3
+despejado.mp3
+cubierto.mp3
