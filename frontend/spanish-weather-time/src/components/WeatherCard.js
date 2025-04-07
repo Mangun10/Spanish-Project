@@ -47,12 +47,6 @@ export const WeatherCard = ({ region, showTranslations }) => {
   return (
     <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-lg p-6 shadow-lg text-center">
       <h2 className="text-2xl font-semibold">{region}</h2>
-      {showTranslations && regionInfo[region] && (
-        <div className="mt-1 mb-3">
-          <p className="text-sm">{regionInfo[region].description}</p>
-          <p className="text-yellow-300 italic text-sm">{regionInfo[region].translation}</p>
-        </div>
-      )}
 
       <div className="mt-4 flex flex-col items-center">
         <img 

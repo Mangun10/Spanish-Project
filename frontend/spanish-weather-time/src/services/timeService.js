@@ -54,5 +54,5 @@ const regionTimezones = {
       day: 'numeric'
     };
     
-    return date.toLocaleDateString('es-ES', options);
+    return date.toLocaleDateString('en', options);
   };

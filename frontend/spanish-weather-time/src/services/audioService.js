@@ -65,6 +65,29 @@ const phrasesAudioMap = {
   'punto': 'phrases/punto.mp3'
 };
 
+// Add this after your other audio maps
+const minutesAudioMap = {
+  '1': 'time/minutes/uno.mp3',
+  '2': 'time/minutes/dos.mp3',
+  '3': 'time/minutes/tres.mp3',
+  '4': 'time/minutes/cuatro.mp3',
+  '5': 'time/minutes/cinco.mp3',
+  '6': 'time/minutes/seis.mp3',
+  '7': 'time/minutes/siete.mp3',
+  '8': 'time/minutes/ocho.mp3',
+  '9': 'time/minutes/nueve.mp3',
+  '10': 'time/minutes/diez.mp3',
+  '11': 'time/minutes/once.mp3',
+  '12': 'time/minutes/doce.mp3',
+  '13': 'time/minutes/trece.mp3',
+  '14': 'time/minutes/catorce.mp3',
+  '15': 'time/minutes/quince.mp3',
+  '20': 'time/minutes/veinte.mp3',
+  '30': 'time/minutes/treinta.mp3',
+  '40': 'time/minutes/cuarenta.mp3',
+  '50': 'time/minutes/cincuenta.mp3'
+};
+
 // Function to play audio files
 const playAudio = (filePath) => {
   try {
@@ -129,6 +152,7 @@ export const playTimeAudio = (hour, timeString) => {
   // Parse the time string to get hours
   const [hoursStr, minutesStr] = timeString.split(':');
   const hours = parseInt(hoursStr, 10);
+  const minutes = parseInt(minutesStr, 10);
   
   // Determine time of day
   let timeOfDay = 'morning';
@@ -269,15 +293,78 @@ export const playAllAudio = (region, weatherConditionText, hour, timeString) => 
     queue.push(timeAudioMap[hour12.toString()]);
   }
   
-  // Add minutes if not at the hour
-  if (minutes > 0 && phrasesAudioMap['y'] && phrasesAudioMap['minutos']) {
-    queue.push(phrasesAudioMap['y']);
-    // Ideally you'd have recordings for each number 1-59, but that's a lot
-    // For simplicity, we'll use speech synthesis for the minutes number
+  // Handle minutes if not at the hour
+  if (minutes > 0) {
+    if (phrasesAudioMap['y']) {
+      queue.push(phrasesAudioMap['y']);
+    }
     
-    // Add time of day
-    if (timeAudioMap[timeOfDay]) {
-      queue.push(timeAudioMap[timeOfDay]);
+    // Handle minutes using component parts
+    if (minutes <= 15 || minutes === 20 || minutes === 30 || minutes === 40 || minutes === 50) {
+      // Direct mapping for these common minutes
+      if (minutesAudioMap[minutes.toString()]) {
+        queue.push(minutesAudioMap[minutes.toString()]);
+      }
+    } 
+    else if (minutes > 15 && minutes < 20) {
+      // 16-19: diez + y + single digit
+      queue.push(minutesAudioMap['10']);
+      if (phrasesAudioMap['y']) {
+        queue.push(phrasesAudioMap['y']);
+      }
+      const ones = minutes - 10;
+      if (minutesAudioMap[ones.toString()]) {
+        queue.push(minutesAudioMap[ones.toString()]);
+      }
+    }
+    else if (minutes > 20 && minutes < 30) {
+      // 21-29: veinte + y + single digit
+      queue.push(minutesAudioMap['20']);
+      if (phrasesAudioMap['y']) {
+        queue.push(phrasesAudioMap['y']);
+      }
+      const ones = minutes - 20;
+      if (minutesAudioMap[ones.toString()]) {
+        queue.push(minutesAudioMap[ones.toString()]);
+      }
+    }
+    else if (minutes > 30 && minutes < 40) {
+      // 31-39: treinta + y + single digit
+      queue.push(minutesAudioMap['30']);
+      if (phrasesAudioMap['y']) {
+        queue.push(phrasesAudioMap['y']);
+      }
+      const ones = minutes - 30;
+      if (minutesAudioMap[ones.toString()]) {
+        queue.push(minutesAudioMap[ones.toString()]);
+      }
+    }
+    else if (minutes > 40 && minutes < 50) {
+      // 41-49: cuarenta + y + single digit
+      queue.push(minutesAudioMap['40']);
+      if (phrasesAudioMap['y']) {
+        queue.push(phrasesAudioMap['y']);
+      }
+      const ones = minutes - 40;
+      if (minutesAudioMap[ones.toString()]) {
+        queue.push(minutesAudioMap[ones.toString()]);
+      }
+    }
+    else if (minutes > 50 && minutes < 60) {
+      // 51-59: cincuenta + y + single digit
+      queue.push(minutesAudioMap['50']);
+      if (phrasesAudioMap['y']) {
+        queue.push(phrasesAudioMap['y']);
+      }
+      const ones = minutes - 50;
+      if (minutesAudioMap[ones.toString()]) {
+        queue.push(minutesAudioMap[ones.toString()]);
+      }
+    }
+    
+    // Add "minutos" after the number
+    if (phrasesAudioMap['minutos']) {
+      queue.push(phrasesAudioMap['minutos']);
     }
   } else {
     // No minutes, just add time of day
