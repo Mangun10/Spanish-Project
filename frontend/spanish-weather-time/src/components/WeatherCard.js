@@ -92,12 +92,12 @@ const conditionText = weather.current.condition.text;
             <p className="font-bold">{weather.current.uv}</p>
           </div>
         </div>
-        <p className="text-xs mt-4 text-gray-200">
+        {/* <p className="text-xs mt-4 text-gray-200">
           Actualizado: {weather.current.last_updated}
           {showTranslations && (
             <span className="block text-yellow-300 italic">Updated: {weather.current.last_updated}</span>
           )}
-        </p>
+        </p> */}
       </div>
     </div>
   );
