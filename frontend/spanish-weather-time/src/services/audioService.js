@@ -358,212 +358,139 @@ function playAudioQueue(queue) {
   playNext();
 }
 
-export const playAllAudio = (region, weatherConditionText, hour, timeString) => {
-  console.log(`🔊 Playing all audio for: ${region}, ${weatherConditionText}, ${timeString}`);
+// export const playAllAudio = (region, weatherConditionText, hour, timeString) => {
+//   console.log(`🔊 Playing all audio for: ${region}, ${weatherConditionText}, ${timeString}`);
   
-  // Queue up the audio files to play in sequence
-  const queue = [];
+//   // Queue up the audio files to play in sequence
+//   const queue = [];
   
-  // Add welcome and introduction if available
-  if (phrasesAudioMap['bienvenido']) {
-    queue.push(phrasesAudioMap['bienvenido']);
-  }
   
-  // Add region phrase: "La región es Madrid"
-  if (phrasesAudioMap['intro-region']) {
-    queue.push(phrasesAudioMap['intro-region']);
-  }
+//   // Region audio - add intro phrase and region name
+//   if (phrasesAudioMap['intro-region']) {
+//     queue.push(phrasesAudioMap['intro-region']);
+//   }
+//   if (regionAudioMap[region]) {
+//     queue.push(regionAudioMap[region]);
+//   }
   
-  // Add region name
-  if (regionAudioMap[region]) {
-    queue.push(regionAudioMap[region]);
-  }
+//   // Weather audio - add intro phrase and weather condition
+//   if (phrasesAudioMap['intro-weather']) {
+//     queue.push(phrasesAudioMap['intro-weather']);
+//   }
+//   if (weatherAudioMap[weatherConditionText]) {
+//     queue.push(weatherAudioMap[weatherConditionText]);
+//   }
   
-  // Add weather phrase: "El tiempo está soleado"
-  if (phrasesAudioMap['intro-weather']) {
-    queue.push(phrasesAudioMap['intro-weather']);
-  }
+//   // Time audio - add intro phrase, then get time components
+//   if (phrasesAudioMap['intro-time']) {
+//     queue.push(phrasesAudioMap['intro-time']);
+//   }
   
-  // Add weather condition
-  if (weatherAudioMap[weatherConditionText]) {
-    queue.push(weatherAudioMap[weatherConditionText]);
-  }
+//   // Create a temporary queue just for time components
+//   const timeQueue = [];
   
-  // Add time introduction: "La hora es..."
-  if (phrasesAudioMap['intro-time']) {
-    queue.push(phrasesAudioMap['intro-time']);
-  }
+//   // Call a modified version of playTimeAudio that just returns the queue
+//   getTimeAudioQueue(hour, timeString, timeQueue);
   
-  // Add time components
-  const [hoursStr, minutesStr] = timeString.split(':');
-  const hours = parseInt(hoursStr, 10);
-  const minutes = parseInt(minutesStr, 10);
-  const hour12 = hours > 12 ? hours - 12 : (hours === 0 ? 12 : hours);
+//   // Add the time queue to our main queue
+//   queue.push(...timeQueue);
   
-  // Determine time of day
-  let timeOfDay = 'morning';
-  if (hours >= 12 && hours < 14) {
-    timeOfDay = 'noon';
-  } else if (hours >= 14 && hours < 21) {
-    timeOfDay = 'afternoon';
-  } else if (hours >= 21 || hours < 6) {
-    timeOfDay = 'night';
-  }
-  
-  // Add hour audio
-  if (timeAudioMap[hour12.toString()]) {
-    queue.push(timeAudioMap[hour12.toString()]);
-  }
-  
-  // Handle minutes if not at the hour
-  if (minutes > 0) {
-    if (phrasesAudioMap['y']) {
-      queue.push(phrasesAudioMap['y']);
-    }
-    
-    // Handle minutes using component parts
-    if (minutes <= 15 || minutes === 20 || minutes === 30 || minutes === 40 || minutes === 50) {
-      // Direct mapping for these common minutes
-      if (minutesAudioMap[minutes.toString()]) {
-        queue.push(minutesAudioMap[minutes.toString()]);
-      }
-    } 
-    else if (minutes > 15 && minutes < 20) {
-      // 16-19: diez + y + single digit
-      queue.push(minutesAudioMap['10']);
-      if (phrasesAudioMap['y']) {
-        queue.push(phrasesAudioMap['y']);
-      }
-      const ones = minutes - 10;
-      if (minutesAudioMap[ones.toString()]) {
-        queue.push(minutesAudioMap[ones.toString()]);
-      }
-    }
-    else if (minutes > 20 && minutes < 30) {
-      // 21-29: veinte + y + single digit
-      queue.push(minutesAudioMap['20']);
-      if (phrasesAudioMap['y']) {
-        queue.push(phrasesAudioMap['y']);
-      }
-      const ones = minutes - 20;
-      if (minutesAudioMap[ones.toString()]) {
-        queue.push(minutesAudioMap[ones.toString()]);
-      }
-    }
-    else if (minutes > 30 && minutes < 40) {
-      // 31-39: treinta + y + single digit
-      queue.push(minutesAudioMap['30']);
-      if (phrasesAudioMap['y']) {
-        queue.push(phrasesAudioMap['y']);
-      }
-      const ones = minutes - 30;
-      if (minutesAudioMap[ones.toString()]) {
-        queue.push(minutesAudioMap[ones.toString()]);
-      }
-    }
-    else if (minutes > 40 && minutes < 50) {
-      // 41-49: cuarenta + y + single digit
-      queue.push(minutesAudioMap['40']);
-      if (phrasesAudioMap['y']) {
-        queue.push(phrasesAudioMap['y']);
-      }
-      const ones = minutes - 40;
-      if (minutesAudioMap[ones.toString()]) {
-        queue.push(minutesAudioMap[ones.toString()]);
-      }
-    }
-    else if (minutes > 50 && minutes < 60) {
-      // 51-59: cincuenta + y + single digit
-      queue.push(minutesAudioMap['50']);
-      if (phrasesAudioMap['y']) {
-        queue.push(phrasesAudioMap['y']);
-      }
-      const ones = minutes - 50;
-      if (minutesAudioMap[ones.toString()]) {
-        queue.push(minutesAudioMap[ones.toString()]);
-      }
-    }
-    
-    // Add "minutos" after the number
-    if (phrasesAudioMap['minutos']) {
-      queue.push(phrasesAudioMap['minutos']);
-    }
-  } else {
-    // No minutes, just add time of day
-    if (timeAudioMap[timeOfDay]) {
-      queue.push(timeAudioMap[timeOfDay]);
-    }
-  }
-  
-  // Play the queue in sequence
-  let currentIndex = 0;
-  
-  const playNext = () => {
-    if (currentIndex < queue.length) {
-      console.log(`🔊 Playing queue item ${currentIndex + 1}/${queue.length}: ${queue[currentIndex]}`);
-      const audio = new Audio(`/assets/audio/${queue[currentIndex]}`);
-      audio.onended = () => {
-        currentIndex++;
-        playNext();
-      };
-      audio.play().catch(error => {
-        console.error(`🔊 Error playing audio in sequence: ${error.message}`);
-        currentIndex++;
-        playNext();
-      });
-    }
-  };
-  
-  // Start playing the sequence
-  if (queue.length > 0) {
-    playNext();
-  } else {
-    // Fallback to speech synthesis if no audio files are available
-    // (using your existing fallback code)
-  }
-};
+//   // Play the entire sequence
+//   playAudioQueue(queue);
+// };
 
-// Add this function to test audio files directly
-export const testAudioFile = (audioPath) => {
-  console.log(`🧪 Testing audio file: ${audioPath}`);
+// Helper function that duplicates playTimeAudio logic but returns a queue instead of playing it
+// function getTimeAudioQueue(hour, timeString, queue) {
+//   // Get time data
+//   const date = new Date();
+//   if (hour) {
+//     date.setHours(hour);
+//   }
+//   if (timeString) {
+//     const [hours, minutes] = timeString.split(':').map(Number);
+//     date.setHours(hours);
+//     date.setMinutes(minutes);
+//   }
   
-  // Try to fetch the file to see if it exists
-  fetch(`/assets/audio/${audioPath}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`File not found or server error: ${response.status}`);
-      }
-      console.log(`🧪 File exists! Status: ${response.status}`);
-      return response.blob();
-    })
-    .then(blob => {
-      console.log(`🧪 File type: ${blob.type}, size: ${blob.size} bytes`);
-      if (blob.size === 0) {
-        console.warn('🧪 Warning: File has zero bytes');
-      }
-      
-      // Now try to play it
-      const audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(audioUrl);
-      
-      audio.addEventListener('canplaythrough', () => {
-        console.log('🧪 Audio loaded successfully and can be played');
-      });
-      
-      audio.addEventListener('error', (e) => {
-        console.error('🧪 Error loading audio:', e);
-      });
-      
-      // Try playing
-      return audio.play()
-        .then(() => {
-          console.log('🧪 Audio playing successfully!');
-        })
-        .catch(err => {
-          console.error('🧪 Error playing audio:', err);
-        });
-    })
-    .catch(error => {
-      console.error('🧪 Error testing audio file:', error);
-    });
-};
+//   // Parse the hours and minutes
+//   const hours = date.getHours();
+//   const minutes = date.getMinutes();
+//   const hour12 = hours % 12 || 12;
+  
+//   // Step 1: Add the hour introductory phrase (Son las / Es la)
+//   if (hour12 === 1) {
+//     queue.push('time/es-la-una.mp3');
+//   } else {
+//     queue.push(`time/son-las-${getHourName(hour12)}.mp3`);
+//   }
+  
+//   // Step 2: Handle minutes - all the existing logic from playTimeAudio
+//   if (minutes === 0) {
+//     // Exact hour, no additional audio needed
+//   } else if (minutes === 15) {
+//     queue.push('phrases/y.mp3');
+//     queue.push('time/minutes/cuarto.mp3');
+//   } else if (minutes === 30) {
+//     queue.push('phrases/y.mp3');
+//     queue.push('time/minutes/media.mp3');
+//   } else if (minutes === 45) {
+//     queue.push('phrases/menos.mp3');
+//     queue.push('time/minutes/cuarto.mp3');
+//   } else if (minutes < 30) {
+//     queue.push('phrases/y.mp3');
+//     if (minutes <= 15 || minutes === 20) {
+//       queue.push(`time/minutes/${getMinuteName(minutes)}.mp3`);
+//     } else if (minutes > 15 && minutes < 20) {
+//       queue.push('time/minutes/diez.mp3');
+//       queue.push('phrases/y.mp3');
+//       const ones = minutes - 10;
+//       queue.push(`time/minutes/${getMinuteName(ones)}.mp3`);
+//     } else if (minutes > 20 && minutes < 30) {
+//       queue.push('time/minutes/veinte.mp3');
+//       queue.push('phrases/y.mp3');
+//       const ones = minutes - 20;
+//       queue.push(`time/minutes/${getMinuteName(ones)}.mp3`);
+//     }
+//     if (minutes === 1) {
+//       queue.push('phrases/minuto.mp3');
+//     } else {
+//       queue.push('phrases/minutos.mp3');
+//     }
+//   } else {
+//     const minutesToNextHour = 60 - minutes;
+//     if (minutesToNextHour === 15) {
+//     } else {
+//       queue.push('phrases/menos.mp3');
+//       if (minutesToNextHour <= 15 || minutesToNextHour === 20) {
+//         queue.push(`time/minutes/${getMinuteName(minutesToNextHour)}.mp3`);
+//       } else if (minutesToNextHour > 15 && minutesToNextHour < 20) {
+//         queue.push('time/minutes/diez.mp3');
+//         queue.push('phrases/y.mp3');
+//         const ones = minutesToNextHour - 10;
+//         queue.push(`time/minutes/${getMinuteName(ones)}.mp3`);
+//       } else if (minutesToNextHour > 20 && minutesToNextHour < 30) {
+//         queue.push('time/minutes/veinte.mp3');
+//         queue.push('phrases/y.mp3');
+//         const ones = minutesToNextHour - 20;
+//         queue.push(`time/minutes/${getMinuteName(ones)}.mp3`);
+//       }
+//       if (minutesToNextHour === 1) {
+//         queue.push('phrases/minuto.mp3');
+//       } else {
+//         queue.push('phrases/minutos.mp3');
+//       }
+//     }
+//   }
+  
+//   // Step 3: Add time of day
+//   if (hours >= 6 && hours < 12) {
+//     queue.push('time/de-la-mañana.mp3');
+//   } else if (hours >= 12 && hours < 14) {
+//     queue.push('time/del-mediodia.mp3');
+//   } else if (hours >= 14 && hours < 21) {
+//     queue.push('time/de-la-tarde.mp3');
+//   } else {
+//     queue.push('time/de-la-noche.mp3');
+//   }
+// }
+
