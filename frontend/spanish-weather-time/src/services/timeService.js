@@ -152,9 +152,7 @@ export const getTimeOfDayInSpanish = (datetime) => {
   // Determine time of day in Spanish
   if (hours >= 6 && hours < 12) {
     return 'de la mañana';
-  } else if (hours >= 12 && hours < 14) {
-    return 'del mediodía';
-  } else if (hours >= 14 && hours < 21) {
+  } else if (hours >= 12 && hours < 21) {
     return 'de la tarde';
   } else {
     return 'de la noche';
@@ -195,7 +193,7 @@ export const getFullTimeInSpanish = (datetime) => {
     } else if (minutes === 30) {
       return `${hourPhrase} y media ${getTimeOfDayInSpanish(datetime)}`;
     } else {
-      return `${hourPhrase} y ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'} ${getTimeOfDayInSpanish(datetime)}`;
+      return `${hourPhrase} y ${minutes}  ${getTimeOfDayInSpanish(datetime)}`;
     }
   } 
   // For minutes 31-59 (to the next hour)
@@ -217,7 +215,7 @@ export const getFullTimeInSpanish = (datetime) => {
     if (minutesToNextHour === 15) {
       return `Son menos cuarto para ${nextHour === 1 || nextHour === 13 ? 'la una' : 'las ' + nextHour12} ${getTimeOfDayInSpanish(nextHourDate)}`;
     } else {
-      return `Son las ${nextHour12} menos ${minutesToNextHour} ${minutesToNextHour === 1 ? 'minuto' : 'minutos'} ${getTimeOfDayInSpanish(nextHourDate)}`;
+      return `Son las ${nextHour12} menos ${minutesToNextHour} ${getTimeOfDayInSpanish(nextHourDate)}`;
     }
   }
 };

@@ -63,14 +63,16 @@ export const AudioPlayer = ({ region, weatherConditionCode, weatherConditionText
         </button>
       </div>
       <button
-        onClick={() => {
+         onClick={() => {
           handlePlayRegion();
+          // Fixed delay between sections - make it long enough to accommodate any region
           setTimeout(() => {
             if (hasWeatherData) handlePlayWeather();
+            // Fixed delay for next section
             setTimeout(() => {
               if (hasTimeData) handlePlayTime();
-            }, 1000);
-          }, 1000);
+            }, 3000); // 3 seconds after weather starts
+          }, 3000); // 3 seconds after region starts
         }}
         className="mt-4 px-6 py-2 bg-purple-500 text-white font-bold rounded-lg shadow-md hover:bg-purple-600 transition w-full md:w-auto md:px-12"
       >
