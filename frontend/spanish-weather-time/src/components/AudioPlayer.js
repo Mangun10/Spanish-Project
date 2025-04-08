@@ -13,9 +13,7 @@ export const AudioPlayer = ({ region, weatherConditionCode, weatherConditionText
     }
   };
   const handlePlayTime = () => {
-    if (hour !== undefined && timeString) {
-      playTimeAudio(hour, timeString);
-    }
+    playTimeAudio(region);
   };
 
   // Check if we have weather and time data before enabling buttons

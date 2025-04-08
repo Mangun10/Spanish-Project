@@ -38,9 +38,8 @@ export const TimeDisplay = ({ region, showTranslations }) => {
     
     // Update time every minute using our manual formatters
     const interval = setInterval(() => {
-      const now = new Date();
-      setCurrentTime(formatTimeInSpanish(now));
-      setFullTimePhrase(getFullTimeInSpanish(now));
+      // Re-fetch the time data from the API instead of using local time
+      getTimeData();
     }, 60000);
     
     return () => clearInterval(interval);
@@ -66,8 +65,22 @@ export const TimeDisplay = ({ region, showTranslations }) => {
 
   // Get hours for translation (extract from current time)
   const hours = new Date(timeData.datetime).getHours();
-  const periodOfDay = hours < 12 ? 'de la mañana' : 
-                     (hours < 20 ? 'de la tarde' : 'de la noche');
+  const getTimeOfDay = (datetime) => {
+    const date = new Date(datetime);
+    const hours = date.getHours();
+    // console.log("Current hours:", hours);
+    if (hours >= 6 && hours < 12) {
+      return 'de la mañana';
+    } else if (hours >=12 && hours < 21) {
+      return 'de la tarde';
+    } else {
+      return 'de la noche';
+    }
+  };
+  
+  // Then in your render part:
+  const periodOfDay = getTimeOfDay(timeData.datetime);
+  
   const periodTranslation = timeTranslations[periodOfDay];
 
   // For English translation, use the browser's formatter

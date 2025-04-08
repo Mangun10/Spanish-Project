@@ -1,3 +1,5 @@
+const api_key = 'DUAXN0QCXZUV';
+
 // services/timeService.js
 const regionTimezones = {
   'Madrid': 'Europe/Madrid',
@@ -7,7 +9,7 @@ const regionTimezones = {
   'Bilbao': 'Europe/Madrid',
 };
 
-// Helper function to determine if DST is active in Spain - place this BEFORE fetchTimeData
+// Helper function to determine if DST is active in Spain
 function isDSTinSpain(date) {
   // Spain follows EU DST rules: 
   // DST begins last Sunday of March at 1:00 UTC
@@ -32,61 +34,214 @@ function isDSTinSpain(date) {
   return date >= dstStart && date < dstEnd;
 }
 
-// Now the main fetchTimeData function
+// Helper function to format GMT offset from seconds to "+HH:MM" format
+function formatOffset(offsetSeconds) {
+  // Convert seconds to hours and minutes
+  const totalMinutes = Math.abs(offsetSeconds) / 60;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  // Format with sign and padding
+  const sign = offsetSeconds >= 0 ? '+' : '-';
+  const paddedHours = hours.toString().padStart(2, '0');
+  const paddedMinutes = minutes.toString().padStart(2, '0');
+  
+  return `${sign}${paddedHours}:${paddedMinutes}`;
+}
+
+// Map hour numbers to Spanish words
+export const getHourWordInSpanish = (hour) => {
+  const hourWords = {
+    1: 'una',
+    2: 'dos',
+    3: 'tres',
+    4: 'cuatro',
+    5: 'cinco',
+    6: 'seis',
+    7: 'siete',
+    8: 'ocho',
+    9: 'nueve',
+    10: 'diez',
+    11: 'once',
+    12: 'doce'
+  };
+  return hourWords[hour] || hour.toString();
+};
+
+// Map minute numbers to Spanish words
+export const getMinuteWordInSpanish = (minute) => {
+  // Special cases - direct mapping
+  const minuteWords = {
+    1: 'uno',
+    2: 'dos',
+    3: 'tres',
+    4: 'cuatro',
+    5: 'cinco',
+    6: 'seis',
+    7: 'siete',
+    8: 'ocho',
+    9: 'nueve',
+    10: 'diez',
+    11: 'once',
+    12: 'doce',
+    13: 'trece',
+    14: 'catorce',
+    15: 'quince',
+    16: 'dieciséis',
+    17: 'diecisiete',
+    18: 'dieciocho',
+    19: 'diecinueve',
+    20: 'veinte',
+    21: 'veintiuno',
+    22: 'veintidós',
+    23: 'veintitrés',
+    24: 'veinticuatro',
+    25: 'veinticinco',
+    26: 'veintiséis',
+    27: 'veintisiete',
+    28: 'veintiocho',
+    29: 'veintinueve',
+    30: 'treinta',
+    40: 'cuarenta',
+    50: 'cincuenta'
+  };
+  
+  // Direct mapping for common numbers
+  if (minuteWords[minute]) {
+    return minuteWords[minute];
+  }
+  
+  // Compound numbers (31-39, 41-49, 51-59)
+  if (minute > 30 && minute < 40) {
+    return `treinta y ${getMinuteWordInSpanish(minute - 30)}`;
+  } else if (minute > 40 && minute < 50) {
+    return `cuarenta y ${getMinuteWordInSpanish(minute - 40)}`;
+  } else if (minute > 50 && minute < 60) {
+    return `cincuenta y ${getMinuteWordInSpanish(minute - 50)}`;
+  }
+  
+  // Fallback for any unexpected values
+  return minute.toString();
+};
+
+// Fetch time data using the TimezoneDB API
 export const fetchTimeData = async (region) => {
   try {
-    // Get current time
-    const now = new Date();
+    // Get timezone for the selected region (defaults to Madrid)
+    const timezone = regionTimezones[region] || 'Europe/Madrid';
     
-    // Check if DST is active using our helper function
-    const isDST = isDSTinSpain(now);
-    console.log(`🕒 DST active in Spain (per calculation): ${isDST ? 'Yes' : 'No'}`);
+    // Build API URL
+    const apiUrl = `http://api.timezonedb.com/v2.1/get-time-zone?key=${api_key}&format=json&by=zone&zone=${timezone}`;
     
-    // Get Spain time directly using the browser's built-in time zone handling
-    const spainTimeStr = now.toLocaleString('en-US', { timeZone: 'Europe/Madrid' });
-    const spainTime = new Date(spainTimeStr);
+    console.log(`🕒 Fetching time data for ${timezone}`);
     
-    console.log(`🕒 Local browser time: ${now.toISOString()}`);
-    console.log(`🕒 Calculated Spain time: ${spainTime.toISOString()}`);
+    // Fetch the data
+    const response = await fetch(apiUrl);
+    const data = await response.json();
     
-    // Create response object
+    // Check if the request was successful
+    if (data.status !== 'OK') {
+      throw new Error(`API Error: ${data.message}`);
+    }
+    
+    console.log('🕒 Received time data:', data);
+    
+    // Parse the formatted time
+    const [datePart, timePart] = data.formatted.split(' ');
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+    
+    // Create a Date object for additional calculations
+    const date = new Date(data.formatted);
+    
+    // Return structured time data
     return {
-      datetime: spainTime.toISOString(),
-      timezone: regionTimezones[region] || 'Europe/Madrid',
-      utc_offset: isDST ? '+02:00' : '+01:00',
-      dst: isDST,
-      day_of_week: spainTime.getDay(),
-      day_of_year: Math.floor((spainTime - new Date(spainTime.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24)
+      datetime: date.toISOString(),
+      formatted: data.formatted,
+      timezone: data.zoneName,
+      utc_offset: formatOffset(data.gmtOffset),
+      dst: data.dst === "1",
+      hours: hours,
+      minutes: minutes,
+      day_of_week: date.getDay(),
+      day_of_year: Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24),
+      abbreviation: data.abbreviation
     };
   } catch (error) {
-    console.error('Error calculating time data:', error);
-    // Fallback to direct calculation without time zones
+    console.error('Error fetching time data from API:', error);
+    
+    // First fallback: Using browser's built-in timezone handling
     try {
-      // Direct time difference calculation as fallback
-      const now = new Date();
-      const utcTime = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-      // Spain is UTC+1 (standard) or UTC+2 (DST)
-      const spainOffset = isDSTinSpain(now) ? 2 : 1;
-      const spainTime = new Date(utcTime.getTime() + spainOffset * 3600000);
+      console.log('🕒 Using first fallback method to determine time');
       
-      console.log(`🕒 Fallback calculation used. DST active: ${spainOffset === 2 ? 'Yes' : 'No'}`);
+      // Get current browser time
+      const now = new Date();
+      
+      // Format it as if in Spain's timezone
+      const spainTimeStr = now.toLocaleString('en-US', { timeZone: 'Europe/Madrid' });
+      const spainTime = new Date(spainTimeStr);
+      
+      console.log(`🕒 Fallback Spain time: ${spainTime}`);
+      
+      // Determine if DST is active in Spain using our helper function
+      const isDST = isDSTinSpain(now);
       
       return {
         datetime: spainTime.toISOString(),
+        formatted: spainTime.toLocaleString(),
         timezone: regionTimezones[region] || 'Europe/Madrid',
-        utc_offset: spainOffset === 2 ? '+02:00' : '+01:00',
-        dst: spainOffset === 2,
+        utc_offset: isDST ? '+02:00' : '+01:00',
+        dst: isDST,
+        hours: spainTime.getHours(),
+        minutes: spainTime.getMinutes(),
         day_of_week: spainTime.getDay(),
-        day_of_year: Math.floor((spainTime - new Date(spainTime.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24)
+        day_of_year: Math.floor((spainTime - new Date(spainTime.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24),
+        abbreviation: isDST ? 'CEST' : 'CET'
       };
     } catch (fallbackError) {
-      console.error('Fallback time calculation failed:', fallbackError);
-      return {
-        datetime: new Date().toISOString(),
-        timezone: regionTimezones[region] || 'Europe/Madrid',
-        utc_offset: '+01:00',
-        dst: false
-      };
+      console.error('First fallback time calculation failed:', fallbackError);
+      
+      // Second fallback: Direct time difference calculation
+      try {
+        console.log('🕒 Using second fallback method to determine time');
+        
+        // Direct time difference calculation as fallback
+        const now = new Date();
+        const utcTime = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+        // Spain is UTC+1 (standard) or UTC+2 (DST)
+        const spainOffset = isDSTinSpain(now) ? 2 : 1;
+        const spainTime = new Date(utcTime.getTime() + spainOffset * 3600000);
+        
+        console.log(`🕒 Fallback calculation used. DST active: ${spainOffset === 2 ? 'Yes' : 'No'}`);
+        
+        return {
+          datetime: spainTime.toISOString(),
+          formatted: spainTime.toLocaleString(),
+          timezone: regionTimezones[region] || 'Europe/Madrid',
+          utc_offset: spainOffset === 2 ? '+02:00' : '+01:00',
+          dst: spainOffset === 2,
+          hours: spainTime.getHours(),
+          minutes: spainTime.getMinutes(),
+          day_of_week: spainTime.getDay(),
+          day_of_year: Math.floor((spainTime - new Date(spainTime.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24),
+          abbreviation: spainOffset === 2 ? 'CEST' : 'CET'
+        };
+      } catch (secondFallbackError) {
+        console.error('Second fallback time calculation failed:', secondFallbackError);
+        
+        // Last resort: use local time
+        const localTime = new Date();
+        return {
+          datetime: localTime.toISOString(),
+          formatted: localTime.toLocaleString(),
+          timezone: 'Europe/Madrid',
+          utc_offset: '+01:00',
+          dst: false,
+          hours: localTime.getHours(),
+          minutes: localTime.getMinutes(),
+          day_of_week: localTime.getDay(),
+          abbreviation: 'CET'
+        };
+      }
     }
   }
 };
@@ -144,11 +299,12 @@ export const formatDateInSpanish = (datetime) => {
 
 // Function to get time of day in Spanish
 export const getTimeOfDayInSpanish = (datetime) => {
-  if (!datetime) return '';
-  
-  const date = new Date(datetime);
+  const date = datetime instanceof Date ? datetime : new Date(datetime);
   const hours = date.getHours();
   
+  console.log("Current hours in getTimeOfDayInSpanish Function:", hours);
+  
+
   // Determine time of day in Spanish
   if (hours >= 6 && hours < 12) {
     return 'de la mañana';
@@ -162,38 +318,39 @@ export const getTimeOfDayInSpanish = (datetime) => {
 // Function to get the full time expression in Spanish
 export const getFullTimeInSpanish = (datetime) => {
   if (!datetime) return '';
-  
+  // console.log("Current datetime in getFullTimeInSpanish Function:", datetime);
   const date = new Date(datetime);
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  
-  // Determine the hour phrase
-  let hourPhrase = '';
+  // console.log("in getfull time - Current hours:", hours, "Current minutes:", minutes);
+  // Get hour in 12-hour format
   const hour12 = hours % 12 || 12;
+  
+  // Time of day phrase
+  let timeOfDayPhrase = getTimeOfDayInSpanish(datetime);
   
   // For exact hours
   if (minutes === 0) {
-    if (hours === 1 || hours === 13) {
-      return `Es la una ${getTimeOfDayInSpanish(datetime)}`;
+    if (hour12 === 1) {
+      return `Es la una ${timeOfDayPhrase}`;
     } else {
-      return `Son las ${hour12} ${getTimeOfDayInSpanish(datetime)}`;
+      return `Son las ${getHourWordInSpanish(hour12)} ${timeOfDayPhrase}`;
     }
   }
   
   // For minutes 1-30 (past the hour)
   if (minutes <= 30) {
-    if (hours === 1 || hours === 13) {
-      hourPhrase = 'Es la una';
-    } else {
-      hourPhrase = `Son las ${hour12}`;
-    }
+    // Hour phrase
+    const hourPhrase = hour12 === 1 ? 'Es la una' : `Son las ${getHourWordInSpanish(hour12)}`;
     
+    // Handle special cases first
     if (minutes === 15) {
-      return `${hourPhrase} y cuarto ${getTimeOfDayInSpanish(datetime)}`;
+      return `${hourPhrase} y cuarto ${timeOfDayPhrase}`;
     } else if (minutes === 30) {
-      return `${hourPhrase} y media ${getTimeOfDayInSpanish(datetime)}`;
+      return `${hourPhrase} y media ${timeOfDayPhrase}`;
     } else {
-      return `${hourPhrase} y ${minutes}  ${getTimeOfDayInSpanish(datetime)}`;
+      // Regular minutes
+      return `${hourPhrase} y ${getMinuteWordInSpanish(minutes)} ${timeOfDayPhrase}`;
     }
   } 
   // For minutes 31-59 (to the next hour)
@@ -202,20 +359,48 @@ export const getFullTimeInSpanish = (datetime) => {
     const nextHour12 = nextHour % 12 || 12;
     const minutesToNextHour = 60 - minutes;
     
-    if (nextHour === 1 || nextHour === 13) {
-      hourPhrase = 'Es la una';
-    } else {
-      hourPhrase = `Son las ${nextHour12}`;
-    }
+    // Hour phrase for the NEXT hour
+    const hourPhrase = nextHour12 === 1 ? 'Es la una' : `Son las ${getHourWordInSpanish(nextHour12)}`;
     
-    // Create a new date object for the next hour (without modifying the original)
+    // Create a new date object for the next hour (for correct time of day)
     const nextHourDate = new Date(date);
     nextHourDate.setHours(nextHour);
     
+    // Get time of day for the next hour
+    let nextTimeOfDay = getTimeOfDayInSpanish(nextHourDate);
+    
     if (minutesToNextHour === 15) {
-      return `Son menos cuarto para ${nextHour === 1 || nextHour === 13 ? 'la una' : 'las ' + nextHour12} ${getTimeOfDayInSpanish(nextHourDate)}`;
+      return `${hourPhrase} menos cuarto ${nextTimeOfDay}`;
     } else {
-      return `Son las ${nextHour12} menos ${minutesToNextHour} ${getTimeOfDayInSpanish(nextHourDate)}`;
+      return `${hourPhrase} menos ${getMinuteWordInSpanish(minutesToNextHour)} ${nextTimeOfDay}`;
     }
   }
+};
+
+// Get Spanish phrases for time expressions
+export const getTimePhrasesInSpanish = () => {
+  return {
+    // Hour intro phrases
+    'it is': 'son las',
+    'it is one': 'es la una',
+    
+    // Minute connectors
+    'and': 'y',
+    'quarter': 'cuarto',
+    'half': 'media',
+    'less': 'menos',
+    
+    // Time of day
+    'in the morning': 'de la mañana',
+    'in the afternoon': 'de la tarde',
+    'at night': 'de la noche',
+    'at midnight': 'de la medianoche',
+    
+    // Other useful phrases
+    'minute': 'minuto',
+    'minutes': 'minutos',
+    'hour': 'hora',
+    'hours': 'horas',
+    'o\'clock': 'en punto'
+  };
 };
