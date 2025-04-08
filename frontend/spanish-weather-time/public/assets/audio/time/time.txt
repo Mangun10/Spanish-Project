@@ -1,0 +1,42 @@
+catorce  
+cinco  
+cuatro  
+de la madrugada  
+de la mañana  
+de la noche  
+de la tarde  
+dieciocho  
+diecinueve  
+dieciséis  
+diecisiete  
+diez  
+doce  
+dos  
+en punto  
+es la una  
+media  
+medianoche  
+mediodía  
+menos  
+nueve  
+ocho  
+once  
+quince  
+seis  
+siete  
+son las  
+tres  
+trece  
+treinta  
+uno  
+veinte  
+veinticuatro  
+veinticinco  
+veintidós  
+veintinueve  
+veintiocho  
+veintiséis  
+veintisiete  
+veintitrés  
+veintiuno  
+y
