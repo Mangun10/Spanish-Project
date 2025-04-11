@@ -68,7 +68,7 @@ export const TimeDisplay = ({ region, showTranslations }) => {
   const getTimeOfDay = (datetime) => {
     const date = new Date(datetime);
     const hours = date.getHours();
-    // console.log("Current hours:", hours);
+    console.log("Current hours:", hours);
     if (hours >= 6 && hours < 12) {
       return 'de la mañana';
     } else if (hours >=12 && hours < 21) {
