@@ -309,7 +309,7 @@ export const getTimeOfDayInSpanish = (datetime) => {
   if (hours >= 6 && hours < 12) {
     return 'de la mañana';
   } else if (hours >= 12 && hours < 21) {
-    return 'de la hahaha tarde';
+    return 'de la tarde';
   } else {
     return 'de la noche';
   }
